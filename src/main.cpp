@@ -50,6 +50,7 @@ int main()
     back_button->setPosition(0, 0);
     back_button->onClick([&]() {
         scene = 0;
+        grid->removeAllWidgets();
         });
     stats_window.add(back_button);
 
@@ -62,7 +63,7 @@ int main()
     textBox->getRenderer()->setTextColor(tgui::Color::White);
     search_window.add(textBox);
 
-    auto button = tgui::Button::create("Hit me");
+    auto button = tgui::Button::create("SEARCH");
     button->setSize(100, 100);
     button->setPosition(300 - 50, 300 - 50);
     button->onClick([&](){
@@ -71,12 +72,42 @@ int main()
             scene = 1;
             city_name->setText(city_stats["location"]["name"].get<std::string>());
 
-            float temp = city_stats["current"]["temp_c"].get<float>();
+            float temp_real = city_stats["current"]["temp_c"].get<float>();
             std::ostringstream temp_stream;
-            temp_stream << std::fixed << std::setprecision(1) << temp;
+            temp_stream << std::fixed << std::setprecision(1) << temp_real;
 
-            grid->addWidget(tgui::Label::create("Temperature"), 0, 0);
-            grid->addWidget(tgui::Label::create(temp_stream.str() + "C"), 0, 1);
+            float temp_feel = city_stats["current"]["feelslike_c"].get<float>();
+            std::ostringstream temp_feel_stream;
+            temp_feel_stream << std::fixed << std::setprecision(1) << temp_feel;
+
+            float wind_speed = city_stats["current"]["wind_kph"].get<float>();
+            std::ostringstream wind_speed_stream;
+            wind_speed_stream << (int)wind_speed;
+
+            float uv = city_stats["current"]["uv"].get<float>();
+            std::ostringstream uv_stream;
+            uv_stream << uv;
+
+            int isDay = city_stats["current"]["is_day"].get<int>();
+
+            if(isDay == 1)
+                grid->addWidget(tgui::Label::create("Is day"), 0, 0);
+            else grid->addWidget(tgui::Label::create("Is night"), 0, 0);
+
+            grid->addWidget(tgui::Label::create("Temperature"), 1, 0);
+            grid->addWidget(tgui::Label::create(temp_stream.str() + "C"), 1, 1);
+
+            grid->addWidget(tgui::Label::create("Feels like"), 2, 0);
+            grid->addWidget(tgui::Label::create(temp_feel_stream.str() + "C"), 2, 1);
+
+            grid->addWidget(tgui::Label::create("Condition"), 3, 0);
+            grid->addWidget(tgui::Label::create(city_stats["current"]["condition"]["text"].get<std::string>()), 3, 1);
+
+            grid->addWidget(tgui::Label::create("Wind speed"), 4, 0);
+            grid->addWidget(tgui::Label::create(wind_speed_stream.str() + "km/h"), 4, 1);
+
+            grid->addWidget(tgui::Label::create("Uv"), 5, 0);
+            grid->addWidget(tgui::Label::create(uv_stream.str()), 5, 1);
         }
 
         textBox->setText("");
